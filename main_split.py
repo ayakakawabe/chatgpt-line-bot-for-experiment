@@ -75,7 +75,6 @@ def adjust_num_of_lines(openai_params):
 
 def response_openai(openai_params):
     adjust_num_of_lines(openai_params)
-    print("----- standard request -----")
     completion = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=openai_params
@@ -103,8 +102,10 @@ def callback():
 
 @handler.add(MessageEvent, message=TextMessageContent)
 def message_text(event):
+    print("user:",event.message.text)
     openai_params.append({"role": "user", "content": event.message.text})
     response_message_text=response_openai(openai_params)
+    print("bot:",response_message_text)
     openai_params.append({"role": "assistant", "content": response_message_text})
     with ApiClient(configuration) as api_client:
         line_bot_api = MessagingApi(api_client)
