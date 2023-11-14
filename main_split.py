@@ -36,6 +36,9 @@ from linebot.v3.messaging import (
     TextMessage
 )
 
+from openai import OpenAI
+
+#----settings----/
 load_dotenv()
 
 app = Flask(__name__)
@@ -57,6 +60,28 @@ configuration = Configuration(
     access_token=channel_access_token
 )
 
+client=OpenAI(
+    api_key=os.environ["OPENAI_API_KEY"]
+)
+#/----settings----
+
+openai_params=[
+    {"role": "system", "content": "You are user's friend. Reply a short answer."}
+  ]
+
+def adjust_num_of_lines(openai_params):
+    if(len(openai_params)>10):
+        del openai_params[1]
+
+def response_openai(openai_params):
+    adjust_num_of_lines(openai_params)
+    print("----- standard request -----")
+    completion = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=openai_params
+    )
+    response_text=completion.choices[0].message.content
+    return response_text
 
 @app.route("/callback", methods=['POST'])
 def callback():
@@ -78,12 +103,15 @@ def callback():
 
 @handler.add(MessageEvent, message=TextMessageContent)
 def message_text(event):
+    openai_params.append({"role": "user", "content": event.message.text})
+    response_message_text=response_openai(openai_params)
+    openai_params.append({"role": "assistant", "content": response_message_text})
     with ApiClient(configuration) as api_client:
         line_bot_api = MessagingApi(api_client)
         line_bot_api.reply_message_with_http_info(
             ReplyMessageRequest(
                 reply_token=event.reply_token,
-                messages=[TextMessage(text=event.message.text)]
+                messages=[TextMessage(text=response_message_text)]
             )
         )
 
