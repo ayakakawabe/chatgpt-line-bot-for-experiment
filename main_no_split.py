@@ -66,10 +66,15 @@ client=OpenAI(
 #/----settings----
 
 openai_params=[
-    {"role": "system", "content": "You are user's friend"}
+    {"role": "system", "content": "You are user's friend. Reply a short answer."}
   ]
 
+def adjust_num_of_lines(openai_params):
+    if(len(openai_params)>10):
+        del openai_params[1]
+
 def response_openai(openai_params):
+    adjust_num_of_lines(openai_params)
     print("----- standard request -----")
     completion = client.chat.completions.create(
         model="gpt-3.5-turbo",
@@ -100,6 +105,7 @@ def callback():
 def message_text(event):
     openai_params.append({"role": "user", "content": event.message.text})
     response_message_text=response_openai(openai_params)
+    openai_params.append({"role": "assistant", "content": response_message_text})
     with ApiClient(configuration) as api_client:
         line_bot_api = MessagingApi(api_client)
         line_bot_api.reply_message_with_http_info(
