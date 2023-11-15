@@ -1,17 +1,3 @@
-# -*- coding: utf-8 -*-
-
-#  Licensed under the Apache License, Version 2.0 (the "License"); you may
-#  not use this file except in compliance with the License. You may obtain
-#  a copy of the License at
-#
-#       https://www.apache.org/licenses/LICENSE-2.0
-#
-#  Unless required by applicable law or agreed to in writing, software
-#  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-#  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-#  License for the specific language governing permissions and limitations
-#  under the License.
-
 import os
 import sys
 from argparse import ArgumentParser
@@ -37,6 +23,8 @@ from linebot.v3.messaging import (
 )
 
 from openai import OpenAI
+
+import numpy as np
 
 #----settings----/
 load_dotenv()
@@ -65,9 +53,12 @@ client=OpenAI(
 )
 #/----settings----
 
+
+
 openai_params=[
-    {"role": "system", "content": "You are user's friend. Reply a short answer."}
+    {"role": "system", "content": "You are user's friend. You are chatting with user, so Reply a short japanese answer."}
   ]
+
 
 def adjust_num_of_lines(openai_params):
     if(len(openai_params)>10):
@@ -81,6 +72,45 @@ def response_openai(openai_params):
     )
     response_text=completion.choices[0].message.content
     return response_text
+
+
+
+def index_find_all(message):
+    key_list=["。","!","?","！","？"]
+    index_list=[]
+    for key in key_list:
+        count=message.count(key)
+        last_index = -1
+        for i in range(count):
+            last_index = last_index + 1 + message[last_index + 1:].find(key)
+            index_list.append(last_index)
+    index_list.sort()
+    return index_list
+
+def index_of_the_nearest_at_13(data_list):
+    index = np.argmin(np.abs(np.array(data_list) - 13))
+    return data_list[index]
+
+
+def res_split_message(message):
+    origin_message=message
+    split_message=[]
+    while(len(origin_message)>13):
+        if("。" or "!" or "?" or "！" or "？" in origin_message):
+            split_index_list=index_find_all(origin_message)
+            split_index=index_of_the_nearest_at_13(split_index_list)
+            split_message.append(origin_message[:split_index+1])
+            origin_message=origin_message[split_index+1:]
+            if(len(origin_message)<=13 and origin_message!=""):
+                split_message.append(origin_message)
+        else:
+            split_message.append(origin_message)
+    else:
+        if not split_message:
+            return [message]
+        else:
+            return split_message
+
 
 @app.route("/callback", methods=['POST'])
 def callback():
@@ -105,14 +135,15 @@ def message_text(event):
     print("user:",event.message.text)
     openai_params.append({"role": "user", "content": event.message.text})
     response_message_text=response_openai(openai_params)
-    print("bot:",response_message_text)
+    response_split_message_text=res_split_message(response_message_text)
+    print("bot:",response_split_message_text)
     openai_params.append({"role": "assistant", "content": response_message_text})
     with ApiClient(configuration) as api_client:
         line_bot_api = MessagingApi(api_client)
         line_bot_api.reply_message_with_http_info(
             ReplyMessageRequest(
                 reply_token=event.reply_token,
-                messages=[TextMessage(text=response_message_text)]
+                messages=[TextMessage(text=split_text) for split_text in response_split_message_text]
             )
         )
 
