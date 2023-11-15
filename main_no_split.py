@@ -76,27 +76,30 @@ def response_openai(openai_params):
 
 
 
-def write_csv(user_data,bot_data):
+def write_csv(user_id,bot_id,user_data,bot_data):
     with open('csv/data_no_split.csv', 'a',encoding='utf_8_sig',newline="") as f:
         writer = csv.writer(f)
-        writer.writerow(["user",user_data])
-        writer.writerow(["bot",bot_data])
+        writer.writerow([user_id,"user",user_data])
+        writer.writerow([bot_id,"bot",bot_data])
 
-def write_csv_timestamp(bot_time,user_time):
+def write_csv_timestamp(id,bot_time,user_time):
     with open('csv/timestamp_no_split.csv', 'a',encoding='utf_8_sig',newline="") as f:
         writer = csv.writer(f)
-        writer.writerow([bot_time,user_time])
+        writer.writerow([id,bot_time,user_time])
 
 
 def write_csv_start_info():
     date=datetime.datetime.now()
     with open('csv/data_no_split.csv', 'a',encoding='utf_8_sig',newline="") as f:
         writer = csv.writer(f)
+        writer.writerow("")
         writer.writerow(["experiment-date",date])
+        writer.writerow(["id","speak","content"])
     with open('csv/timestamp_no_split.csv', 'a',encoding='utf_8_sig',newline="") as f:
         writer = csv.writer(f)
+        writer.writerow("")
         writer.writerow(["experiment-date",date])
-        writer.writerow(["bot","user"])
+        writer.writerow(["id","bot","user"])
 
 write_csv_start_info()
 
@@ -120,18 +123,25 @@ def callback():
     return 'OK'
 
 bot_timestamp=0
+user_timestamp=0
+bot_id=2
+user_id=0
 
 @handler.add(MessageEvent, message=TextMessageContent)
 def message_text(event):
     global bot_timestamp
+    global user_timestamp
+    global bot_id
+    global user_id
     user_timestamp=event.timestamp/1000
-    print("user:",event.message.text)
-    print("user:",user_timestamp)
+    user_id+=1
+    print("user",user_id,":",event.message.text)
+    print("user",user_id,":",user_timestamp)
     openai_params.append({"role": "user", "content": event.message.text})
     response_message_text=response_openai(openai_params)
-    print("bot:",response_message_text)
-    write_csv(event.message.text,response_message_text)
-    write_csv_timestamp(bot_timestamp,user_timestamp)
+    print("bot",bot_id,":",response_message_text)
+    write_csv(user_id,bot_id,event.message.text,response_message_text)
+    write_csv_timestamp(user_id,bot_timestamp,user_timestamp)
     openai_params.append({"role": "assistant", "content": response_message_text})
     with ApiClient(configuration) as api_client:
         line_bot_api = MessagingApi(api_client)
@@ -142,7 +152,8 @@ def message_text(event):
             )
         )
     bot_timestamp=datetime.datetime.timestamp(datetime.datetime.now())
-    print("bot:",bot_timestamp)
+    print("bot",bot_id,":",bot_timestamp)
+    bot_id+=1
     
 
 
