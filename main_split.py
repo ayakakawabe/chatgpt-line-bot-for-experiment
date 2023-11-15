@@ -115,19 +115,29 @@ def res_split_message(message):
 
 
 def write_csv(user_data,bot_data_list):
-    with open('data_split.csv', 'a',encoding='utf_8_sig',newline="") as f:
+    with open('csv/data_split.csv', 'a',encoding='utf_8_sig',newline="") as f:
         writer = csv.writer(f)
         writer.writerow(["user",user_data])
         for bot_data in bot_data_list:
             writer.writerow(["bot",bot_data])
 
-
-def write_csv_date():
-    date=datetime.datetime.now()
-    with open('data_split.csv', 'a',encoding='utf_8_sig',newline="") as f:
+def write_csv_timestamp(bot_time,user_time):
+    with open('csv/timestamp_split.csv', 'a',encoding='utf_8_sig',newline="") as f:
         writer = csv.writer(f)
-        writer.writerow(["date",date])
-write_csv_date()
+        writer.writerow([bot_time,user_time])
+
+
+def write_csv_start_info():
+    date=datetime.datetime.now()
+    with open('csv/data_split.csv', 'a',encoding='utf_8_sig',newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow(["experimentdate",date])
+    with open('csv/timestamp_split.csv', 'a',encoding='utf_8_sig',newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow(["experiment-date",date])
+        writer.writerow(["bot","user"])
+
+write_csv_start_info()
 
 
 
@@ -149,14 +159,20 @@ def callback():
     return 'OK'
 
 
+bot_timestamp=0
+
 @handler.add(MessageEvent, message=TextMessageContent)
 def message_text(event):
+    global bot_timestamp
+    user_timestamp=event.timestamp/1000
     print("user:",event.message.text)
+    print("user:",user_timestamp)
     openai_params.append({"role": "user", "content": event.message.text})
     response_message_text=response_openai(openai_params)
     response_split_message_text=res_split_message(response_message_text)
     print("bot:",response_split_message_text)
     write_csv(event.message.text,response_split_message_text)
+    write_csv_timestamp(bot_timestamp,user_timestamp)
     openai_params.append({"role": "assistant", "content": response_message_text})
     with ApiClient(configuration) as api_client:
         line_bot_api = MessagingApi(api_client)
@@ -166,6 +182,8 @@ def message_text(event):
                 messages=[TextMessage(text=split_text) for split_text in response_split_message_text]
             )
         )
+    bot_timestamp=datetime.datetime.timestamp(datetime.datetime.now())
+    print("bot:",bot_timestamp)
 
 
 if __name__ == "__main__":
