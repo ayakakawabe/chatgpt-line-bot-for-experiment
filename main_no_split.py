@@ -23,6 +23,8 @@ from linebot.v3.messaging import (
 )
 
 from openai import OpenAI
+import csv
+import datetime
 
 #----settings----/
 load_dotenv()
@@ -73,6 +75,22 @@ def response_openai(openai_params):
 
 
 
+def write_csv(user_data,bot_data):
+    with open('data_no_split.csv', 'a',encoding='utf_8_sig',newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow(["user",user_data])
+        writer.writerow(["bot",bot_data])
+
+
+def write_csv_date():
+    date=datetime.datetime.now()
+    with open('data_no_split.csv', 'a',encoding='utf_8_sig',newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow(["date",date])
+write_csv_date()
+
+
+
 @app.route("/callback", methods=['POST'])
 def callback():
     # get X-Line-Signature header value
@@ -97,6 +115,7 @@ def message_text(event):
     openai_params.append({"role": "user", "content": event.message.text})
     response_message_text=response_openai(openai_params)
     print("bot:",response_message_text)
+    write_csv(event.message.text,response_message_text)
     openai_params.append({"role": "assistant", "content": response_message_text})
     with ApiClient(configuration) as api_client:
         line_bot_api = MessagingApi(api_client)
@@ -116,4 +135,4 @@ if __name__ == "__main__":
     arg_parser.add_argument('-d', '--debug', default=False, help='debug')
     options = arg_parser.parse_args()
 
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=False)
