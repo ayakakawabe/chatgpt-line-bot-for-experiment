@@ -3,11 +3,14 @@
 # 概要
 
 ChatGPTが返信するLINE bot
+* 13文字前後になるように分割して返信するbot
+* 分割なしで返信するbot
+
 
 送受信メッセージとタイムスタンプがcsvファイルに保存される
 
-1. 13文字前後になるように分割して返信するbot
-2. 分割なしで返信するbot
+![システム構成イメージ](https://github.com/ayakakawabe/chatgpt-line-bot-for-experiment/assets/103473179/200b8603-aebe-4ac4-b92a-c354416d6309)
+
 
 ## csvファイルの例
 
