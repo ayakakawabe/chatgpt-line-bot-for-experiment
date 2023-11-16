@@ -57,7 +57,8 @@ client=OpenAI(
 
 
 openai_params=[
-    {"role": "system", "content": "You are user's friend. You are chatting with user, so Reply a short japanese answer."}
+    {"role": "system", "content": "You are user's friend. You are chatting with user, so Reply a short japanese answer."},
+    {"role": "assistant","content":"はじめまして！よろしくね"}
   ]
 
 
