@@ -1,6 +1,6 @@
 # chatgpt-line-bot-for-experiment
 
-# 概要
+## 概要
 
 ChatGPTが返信するLINE bot
 * 13文字前後になるように分割して返信するbot
@@ -12,7 +12,7 @@ ChatGPTが返信するLINE bot
 ![システム構成イメージ](https://github.com/ayakakawabe/chatgpt-line-bot-for-experiment/assets/103473179/200b8603-aebe-4ac4-b92a-c354416d6309)
 
 
-## csvファイルの例
+### csvファイルの例
 
 * data_***.csv
   * experiment-date:実験日時
@@ -26,7 +26,7 @@ ChatGPTが返信するLINE bot
   * bot:botのタイムスタンプ（秒）
   * user:userのタイムスタンプ（秒）
     
-### data_split.csv
+#### data_split.csv
 ```
 experiment-date,2023-11-15 23:58:35.416064
 id,speak,content
@@ -44,7 +44,7 @@ id,speak,content
 2,bot,こんにちは！元気ですか？
 ```
 
-### timestamp_split.csv
+#### timestamp_split.csv
 ```
 DON'T use the first data.(bot=0)
 
@@ -60,7 +60,7 @@ id,bot,user
 2,1700060319.046153,1700060322.043
 ```
 
-### data_no_split.csv
+#### data_no_split.csv
 ```
 experiment-date,2023-11-15 23:52:27.656900
 id,speak,content
@@ -72,7 +72,7 @@ id,speak,content
 4,bot,何かしら面白いことがあったのかな？
 ```
 
-### timestamp_no_split.csv
+#### timestamp_no_split.csv
 ```
 DON'T use the first data.(bot=0)
 
@@ -84,7 +84,7 @@ id,bot,user
 ```
 
 
-# 開発環境
+## 開発環境
 
 * Windows10
 * Python 3.11.3
@@ -94,21 +94,21 @@ id,bot,user
 * ptrhon-dotenv 1.0.0
 * line-bot-sdk 3.5.0
 
-# 設定
+## 設定
 
-## ライブラリのインストール
+### ライブラリのインストール
 ```
 pip install -r requirements.txt
 ```
 
-## LINE Developersの設定
+### LINE Developersの設定
 
 [Messaging API](https://developers.line.biz/ja/docs/messaging-api/getting-started/) でチャネルを作成し、チャネルアクセストークンとチャネルシークレットを取得する
 
 * 応答メッセージ・あいさつメッセージを無効にする
 * Webhookの利用を有効
 
-## フォルダ構成
+### フォルダ構成
 
 ```
 .
@@ -124,7 +124,7 @@ pip install -r requirements.txt
 └── requirements.txt
 ```
 
-### .envの作成
+#### .envの作成
 
 1. ルートディレクトリに.envを作成する
 
@@ -139,19 +139,19 @@ OPENAI_API_KEY='YOUR_OPENAI_API_KEY'
 3. 'YOUR_OPENAI_API_KEY'をOpenAIのAPIキーに変更する
 
 
-## webhookの設定
+### webhookの設定
 
 [ngrok](https://ngrok.com/) でローカル環境を外部公開する
 
-### ngrokの設定
+#### ngrokの設定
 [ngrok](https://ngrok.com/)をダウンロード
 
 
 
-# 実行
+## 実行
 ※分割なし/ありを同時に立ち上げないこと！
 
-## 分割なしの場合
+### 分割なしの場合
 
 1. localhostを起動
 ```
@@ -172,7 +172,7 @@ $ ngrok http 5000
 5. Messaging API のQRコードからLINEで友達追加して操作する
 
 
-## 分割ありの場合
+### 分割ありの場合
 
 1. localhostを起動
 ```
