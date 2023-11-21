@@ -186,7 +186,7 @@ $ ngrok http 5000
 3. Terminalに表示されているURL+'/hello'をブラウザで表示させる
    Ex.)https://XXXXXXXX.ngrok-free.app/hello
 
-   「visit site」をクリック→「**NO_SPLIT**」と表示されれはOK
+   「visit site」をクリック→「**NO_SPLIT**」と表示されればOK
 
 4. Messaging APIのwebhookURLにngrokで取得したURL+'/callback'を入力する
   Ex.)https://XXXXXXXX.ngrok-free.app/callback
@@ -211,7 +211,7 @@ $ ngrok http 5000
 3. Terminalに表示されているURL+'/hello'をブラウザで表示させる
    Ex.)https://XXXXXXXX.ngrok-free.app/hello
 
-   「visit site」をクリック→「**YES_SPLIT**」と表示されれはOK
+   「visit site」をクリック→「**YES_SPLIT**」と表示されればOK
    
 5. Messaging APIのwebhookURLにngrokで取得したURL+'/callback'を入力する
   Ex.)https://XXXXXXXX.ngrok-free.app/callback
@@ -227,15 +227,15 @@ $ ngrok http 5000
 2. file > Open folder > chatgpt-line-bot-for-experiment（展開後のファイル）> chatgpt-line-bot-for-experiment > 開く
 
    （二つ目の「chatgpt-line-bot-for-experiment」で開く）
-3. VScode上部のTerminal > New Terminal
-4. VScodeのTerminalの左側の＋ボタンをクリック
+3. VScode上部のTerminal > New Terminal （1つ目のterminal）
+4. VScodeのTerminalの左側の＋ボタンをクリック （2つ目のterminal）
 
 
 ※分割なし/ありを同時に立ち上げないこと！
 
-### 分割なしの場合
+### 分割なし → 分割ありの場合
 
-1. localhostを起動（1つ目のterminal）
+1. 分割なしのlocalhostを起動（1つ目のterminal）
 ```
 python main_no_split.py
 ```
@@ -247,12 +247,67 @@ $ ngrok http 5000
 3. Terminalに表示されているURL+'/hello'をブラウザで表示させる
    Ex.)https://XXXXXXXX.ngrok-free.app/hello
 
-   「visit site」をクリック→「**NO_SPLIT**」と表示されれはOK
+   「visit site」をクリック→「**NO_SPLIT**」と表示されればOK
 
-4. Messaging APIのwebhookURLにngrokで取得したURL+'/callback'を入力する
+4. Messaging APIの**チャネルA**のwebhookURLにngrokで取得したURL+'/callback'を入力する
   Ex.)https://XXXXXXXX.ngrok-free.app/callback
 
 5. webhookURLの検証をクリック
-→「成功」と表示されればOK
 
-6. Messaging API のQRコードからLINEで友達追加して操作する
+   →「成功」と表示されればOK
+
+7. Messaging API のチャネルAをQRコードからLINEで友達追加して操作する
+8. **分割内なしの実験が終わったら**、**1つ目**のterminalで`Ctrl+C`
+9. 分割ありのlocalhostを起動（1つ目のterminal）
+```
+python main_split.py
+```
+9. 3で開いたURLをリロード
+
+    →「**YES_SPLIT**」と表示されればOK
+
+10. Messaging API**のチャネルB**のwebhookURLに4で入力したURLを入力
+11. webhookURLの検証をクリック
+
+    →「成功」と表示されればOK
+12. Messaging API のチャネルBをQRコードからLINEで友達追加して操作する
+
+
+### 分割あり → 分割なしの場合
+
+1. 分割なしのlocalhostを起動（1つ目のterminal）
+```
+python main_split.py
+```
+
+2. ngrokで外部公開（2つ目のterminal）
+```
+$ ngrok http 5000
+```
+3. Terminalに表示されているURL+'/hello'をブラウザで表示させる
+   Ex.)https://XXXXXXXX.ngrok-free.app/hello
+
+   「visit site」をクリック→「**YES_SPLIT**」と表示されればOK
+
+4. Messaging APIの**チャネルB**のwebhookURLにngrokで取得したURL+'/callback'を入力する
+  Ex.)https://XXXXXXXX.ngrok-free.app/callback
+
+5. webhookURLの検証をクリック
+
+   →「成功」と表示されればOK
+
+7. Messaging API のチャネルBをQRコードからLINEで友達追加して操作する
+8. **分割内ありの実験が終わったら**、**1つ目**のterminalで`Ctrl+C`
+9. 分割ありのlocalhostを起動（1つ目のterminal）
+```
+python main_no_split.py
+```
+9. 3で開いたURLをリロード
+
+    →「**NO_SPLIT**」と表示されればOK
+
+10. Messaging API**のチャネルA**のwebhookURLに4で入力したURLを入力
+11. webhookURLの検証をクリック
+
+    →「成功」と表示されればOK
+12. Messaging API のチャネルAをQRコードからLINEで友達追加して操作する
