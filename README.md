@@ -117,7 +117,11 @@ pip install -r requirements.txt
 
 * 応答メッセージを無効にする
 * Webhookの利用・あいさつメッセージを有効（[Isuees:To-do](https://github.com/ayakakawabe/chatgpt-line-bot-for-experiment/issues/1)参照）
-
+* あいさつメッセージ：
+  ```
+  ○○さん
+  はじめまして！最近買ったものについて教えて！
+  ```
 ### フォルダ構成
 
 ```
