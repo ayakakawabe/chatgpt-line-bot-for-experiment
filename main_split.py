@@ -33,8 +33,8 @@ load_dotenv()
 app = Flask(__name__)
 
 # get channel_secret and channel_access_token from your environment variable
-channel_secret = os.environ['LINE_CHANNEL_SECRET']
-channel_access_token = os.environ['LINE_CHANNEL_ACCESS_TOKEN']
+channel_secret = os.environ['LINE_CHANNEL_SECRET_SPLIT']
+channel_access_token = os.environ['LINE_CHANNEL_ACCESS_TOKEN_SPLIT']
 
 if channel_secret is None:
     print('Specify LINE_CHANNEL_SECRET as environment variable.')
@@ -57,7 +57,8 @@ client=OpenAI(
 
 
 openai_params=[
-    {"role": "system", "content": "You are user's friend. You are chatting with user, so Reply a short japanese answer."}
+    {"role": "system", "content": "You are user's friend. You are chatting with user, so Reply a short japanese answer."},
+    {"role": "assistant","content":"はじめまして！最近買ったものについて教えて！"}
   ]
 
 
@@ -142,7 +143,10 @@ def write_csv_start_info():
 
 write_csv_start_info()
 
-
+@app.route("/hello")
+def hello_world():
+    print("YES_split")
+    return "YES_split"
 
 @app.route("/callback", methods=['POST'])
 def callback():

@@ -57,7 +57,7 @@ client=OpenAI(
 
 openai_params=[
     {"role": "system", "content": "You are user's friend. Reply a short answer."},
-    {"role": "assistant","content":"はじめまして！よろしくね"}
+    {"role": "assistant","content":"はじめまして！最近買ったものについて教えて！"}
   ]
 
 
@@ -103,7 +103,10 @@ def write_csv_start_info():
 
 write_csv_start_info()
 
-
+@app.route("/hello")
+def hello_world():
+    print("NO_split")
+    return "NO_split"
 
 @app.route("/callback", methods=['POST'])
 def callback():
