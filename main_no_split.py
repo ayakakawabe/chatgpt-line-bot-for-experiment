@@ -56,7 +56,7 @@ client=OpenAI(
 
 
 openai_params=[
-    {"role": "system", "content": "You are user's friend. Reply a short answer."},
+    {"role": "system", "content": "You'd like to get al well with me. You have a chat with me,so Reply a casual and short sentence in Japanese."},
     {"role": "assistant","content":"はじめまして！最近買ったものについて教えて！"}
   ]
 
@@ -95,6 +95,7 @@ def write_csv_start_info():
         writer.writerow("")
         writer.writerow(["experiment-date",date])
         writer.writerow(["id","speak","content"])
+        writer.writerow(["1","bot","はじめまして！最近買ったものについて教えて！"])
     with open('csv/timestamp_no_split.csv', 'a',encoding='utf_8_sig',newline="") as f:
         writer = csv.writer(f)
         writer.writerow("")
