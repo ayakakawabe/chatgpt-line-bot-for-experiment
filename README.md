@@ -220,3 +220,39 @@ $ ngrok http 5000
 →「成功」と表示されればOK
 
 5. Messaging API のQRコードからLINEで友達追加して操作する
+
+## 🧪実験時🧪
+（使用方法は一通り終わらせている前提で）
+1. VScodeを開く
+2. file > Open folder > chatgpt-line-bot-for-experiment（展開後のファイル）> chatgpt-line-bot-for-experiment > 開く
+
+   （二つ目の「chatgpt-line-bot-for-experiment」で開く）
+3. VScode上部のTerminal > New Terminal
+4. VScodeのTerminalの左側の＋ボタンをクリック
+
+
+※分割なし/ありを同時に立ち上げないこと！
+
+### 分割なしの場合
+
+1. localhostを起動（1つ目のterminal）
+```
+python main_no_split.py
+```
+
+2. ngrokで外部公開（2つ目のterminal）
+```
+$ ngrok http 5000
+```
+3. Terminalに表示されているURL+'/hello'をブラウザで表示させる
+   Ex.)https://XXXXXXXX.ngrok-free.app/hello
+
+   「visit site」をクリック→「**NO_SPLIT**」と表示されれはOK
+
+4. Messaging APIのwebhookURLにngrokで取得したURL+'/callback'を入力する
+  Ex.)https://XXXXXXXX.ngrok-free.app/callback
+
+5. webhookURLの検証をクリック
+→「成功」と表示されればOK
+
+6. Messaging API のQRコードからLINEで友達追加して操作する
