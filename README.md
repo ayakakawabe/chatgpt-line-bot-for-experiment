@@ -94,19 +94,29 @@ id,bot,user
 * ptrhon-dotenv 1.0.0
 * line-bot-sdk 3.5.0
 
+## 💡使用方法💡
+
 ## 設定
 
-### ライブラリのインストール
+1. このgithubから、Code > Download ZIP
+2. ダウンロードしたzipファイルを展開
+3. VScodeを開いて、 file > Open folder > chatgpt-line-bot-for-experiment（展開後のファイル）> chatgpt-line-bot-for-experiment > 開く
+
+   （二つ目の「chatgpt-line-bot-for-experiment」で開く）
+
+### ライブラリのインストール(VScodeのterminal)
 ```
 pip install -r requirements.txt
 ```
 
 ### LINE Developersの設定
 
-[Messaging API](https://developers.line.biz/ja/docs/messaging-api/getting-started/) でチャネルを作成し、チャネルアクセストークンとチャネルシークレットを取得する
+1. [Messaging API](https://developers.line.biz/ja/docs/messaging-api/getting-started/) でチャネルを作成する
+2. MessagingAPI設定 > 長期チャネルアクセストークンを発行する
+3. チャネルアクセストークンとチャネルシークレットを取得し、メモしておく
 
-* 応答メッセージ・あいさつメッセージを無効にする
-* Webhookの利用を有効
+* 応答メッセージを無効にする
+* Webhookの利用・あいさつメッセージを有効（[Isuees:To-do](https://github.com/ayakakawabe/chatgpt-line-bot-for-experiment/issues/1)参照）
 
 ### フォルダ構成
 
@@ -128,15 +138,20 @@ pip install -r requirements.txt
 
 1. ルートディレクトリに.envを作成する
 
+   （VScodeで、左側上部chatgpt-line-bot-for-experimentの横の**New File...**をクリックし、**.env**と入力）
+
 ```
 LINE_CHANNEL_ACCESS_TOKEN='YOUR_CHANNEL_ACCESS_TOKEN'
 LINE_CHANNEL_SECRET='YOUR_CHANNEL_SECRET'
 OPENAI_API_KEY='YOUR_OPENAI_API_KEY'
+LINE_CHANNEL_ACCESS_TOKEN_SPLIT='YOUR_CHANNEL_ACCESS_TOKEN_SPLIT'
+LINE_CHANNEL_SECRET_SPLIT='YOUR_CHANNEL_SECRET_SPLIT'
 ```
 
-2. 'YOUR_CHANNEL_ACCESS_TOKEN'と'YOUR_CHANNEL_SECRET'を、Messaging API で取得したチャネルアクセストークンとチャネルシークレットに変更する
+2. 'YOUR_CHANNEL_ACCESS_TOKEN'と'YOUR_CHANNEL_SECRET'を、Messaging API で取得したチャネルA(分割なし)チャネルアクセストークンとチャネルシークレットに変更する
+3. 'YOUR_CHANNEL_ACCESS_TOKEN_SPLIT'と'YOUR_CHANNEL_SECRET_SPLIT'を、Messaging API で取得したチャネルB(分割あり)チャネルアクセストークンとチャネルシークレットに変更する
 
-3. 'YOUR_OPENAI_API_KEY'をOpenAIのAPIキーに変更する
+4. 'YOUR_OPENAI_API_KEY'をOpenAIのAPIキーに変更する
 
 
 ### webhookの設定
@@ -144,7 +159,9 @@ OPENAI_API_KEY='YOUR_OPENAI_API_KEY'
 [ngrok](https://ngrok.com/) でローカル環境を外部公開する
 
 #### ngrokの設定
-[ngrok](https://ngrok.com/)をダウンロード
+1. [ngrok](https://ngrok.com/)をダウンロード
+2. 公式サイトの手順に従って設定する
+3. `ngrok`コマンドのパスを通す（Windows→[Windowsの環境パスを通す](https://realize.jounin.jp/path.html)）
 
 
 
@@ -153,38 +170,46 @@ OPENAI_API_KEY='YOUR_OPENAI_API_KEY'
 
 ### 分割なしの場合
 
-1. localhostを起動
+1. localhostを起動（VScodeのterminal）
 ```
 python main_no_split.py
 ```
 
-2. ngrokで外部公開
+2. ngrokで外部公開（terminal）
 ```
 $ ngrok http 5000
 ```
+3. Terminalに表示されているURL+'/hello'をブラウザで表示させる
+   Ex.)https://XXXXXXXX.ngrok-free.app/hello
 
-3. Messaging APIのwebhookURLにngrokで取得したURL+'/callback'を入力する
+   「visit site」をクリック→「**NO_SPLIT**」と表示されれはOK
+
+4. Messaging APIのwebhookURLにngrokで取得したURL+'/callback'を入力する
   Ex.)https://XXXXXXXX.ngrok-free.app/callback
 
-4. webhookURLの検証をクリック
+5. webhookURLの検証をクリック
 →「成功」と表示されればOK
 
-5. Messaging API のQRコードからLINEで友達追加して操作する
+6. Messaging API のQRコードからLINEで友達追加して操作する
 
 
 ### 分割ありの場合
 
-1. localhostを起動
+1. localhostを起動（VScodeのterminal）
 ```
 python main_split.py
 ```
 
-2. ngrokで外部公開
+2. ngrokで外部公開（terminal）
 ```
 $ ngrok http 5000
 ```
+3. Terminalに表示されているURL+'/hello'をブラウザで表示させる
+   Ex.)https://XXXXXXXX.ngrok-free.app/hello
 
-3. Messaging APIのwebhookURLにngrokで取得したURL+'/callback'を入力する
+   「visit site」をクリック→「**YES_SPLIT**」と表示されれはOK
+   
+5. Messaging APIのwebhookURLにngrokで取得したURL+'/callback'を入力する
   Ex.)https://XXXXXXXX.ngrok-free.app/callback
 
 4. webhookURLの検証をクリック
