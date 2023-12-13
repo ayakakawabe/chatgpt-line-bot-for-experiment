@@ -311,3 +311,32 @@ python main_no_split.py
 
     →「成功」と表示されればOK
 12. Messaging API のチャネルAをQRコードからLINEで友達追加して操作する
+
+
+## 🥽分析方法🥽
+### 実験後のcsvファイルの整形
+
+analysis/chatgpt-line-bot-analysis/csv/format_timestamp_no_split.csv
+```
+user_id	id	reaction_time
+1	2	16.64851999
+1	3	6.560580015
+1	4	16.56498981
+1	5	40.60481
+2	2	4.208449841
+2	3	11.83561993
+2	4	19.34963989
+2	5	25.66398001
+```
+
+analysis/chatgpt-line-bot-analysis/csv/format_timestamp_split.csv
+```
+user_id	id	reaction_time
+1	2	1.782169819
+1	3	17.83516002
+1	4	6.924889803
+1	5	10.48215008
+1	6	3.929570198
+2	2	3.110630035
+2	3	9.140679836
+```
