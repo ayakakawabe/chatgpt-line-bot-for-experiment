@@ -1,0 +1,156 @@
+---
+title: "chatgpt-line-bot-analysis"
+author: "Ayaka Kawabe"
+date: '2023-12-12'
+output: html_document
+---
+
+# データ読み込み
+
+```{r}
+timestamp_no_split<-read.csv("csv/format_timestamp_no_split.csv",header = T)
+timestamp_split<-read.csv("csv/format_timestamp_split.csv",header = T)
+```
+
+## 分割なし
+```{r}
+head(timestamp_no_split)
+```
+## 分割あり
+```{r}
+head(timestamp_split)
+```
+
+# 基礎統計量
+
+## 個人ごとの分析
+```{r}
+for (person in range(1,max(timestamp_no_split$user_id))) {
+  print("person_id")
+  print(person)
+  
+  print("分割なし",quote=F)
+  person_data_no_split<-subset(timestamp_no_split,user_id==person)
+  print("返信数",quote=F)
+  print(max(person_data_no_split$id))
+  print("最小値　第一四分位　中央値　平均値　第三四分位　最大値（単位:s）",quote=F)
+  print(summary(person_data_no_split$reaction_time))
+  print("標準偏差",quote=F)
+  print(sd(person_data_no_split$reaction_time))
+  print(plot(person_data_no_split$reaction_time,ylab="Response time (s)",xlab="Thread id",main="Plot of response time without split"))
+  
+  print("person_id")
+  print(person)
+  print("分割あり",quote=F)
+  person_data_split<-subset(timestamp_split,user=person)
+  print("返信数",quote=F)
+  print(max(person_data_split$id))
+  print("最小値　第一四分位　中央値　平均値　第三四分位　最大値（単位:s）",quote=F)
+  print(summary(person_data_split$reaction_time))
+  print("標準偏差",quote=F)
+  print(sd(person_data_split$reaction_time))
+  print(plot(person_data_split$reaction_time,ylab="Response time (s)",xlab="Thread id",main="Plot of response time with split"))
+}
+```
+
+## 集積の分析
+
+### 分割なし
+
+```{r}
+hist(timestamp_no_split$reaction_time,breaks=seq(0,max(timestamp_no_split$reaction_time,timestamp_split$reaction_time)+10,5),xlab="Response Time (s)",main="Histogram of response time without split")
+```
+
+データ成形（平均値）
+```{r}
+mean_c<-c()
+for(person in range(1,timestamp_no_split$user_id)){
+  mean_c<-c(mean_c,mean(subset(timestamp_no_split,user_id==person)$reaction_time))
+}
+no_split_data<-data.frame("user_id"=seq(max(timestamp_no_split$user_id)),"reaction_time"=mean_c)
+head(no_split_data)
+```
+
+サイズ（n人）
+```{r}
+no_split_n<-max(timestamp_no_split$user_id)
+no_split_n
+```
+
+最小値　第一四分位　中央値　平均値　第三四分位　最大値
+```{r}
+summary(no_split_data$reaction_time)
+```
+
+標準偏差
+```{r}
+sd(no_split_data$reaction_time)
+```
+
+
+### 分割あり
+
+```{r}
+hist(timestamp_split$reaction_time,breaks=seq(0,max(timestamp_no_split$reaction_time,timestamp_split$reaction_time)+10,5),xlab="Response Time (s)",main="Histogram of response time with split")
+```
+
+データ成形（平均値）
+```{r}
+mean_c<-c()
+for(person in range(1,timestamp_split$user_id)){
+  mean_c<-c(mean_c,mean(subset(timestamp_split,user_id==person)$reaction_time))
+}
+split_data<-data.frame("user_id"=seq(max(timestamp_split$user_id)),"reaction_time"=mean_c)
+head(split_data)
+```
+
+サイズ（n人）
+```{r}
+split_n<-max(timestamp_split$user_id)
+split_n
+```
+
+最小値　第一四分位　中央値　平均値　第三四分位　最大値
+```{r}
+summary(split_data$reaction_time)
+```
+
+標準偏差
+```{r}
+sd(split_data$reaction_time)
+```
+
+### 分割あり/なしの箱ひげ図
+
+```{r}
+library(ggplot2)
+```
+
+```{r}
+compare_response_time_data<-data.frame("dependent"=c(rep("no split",max(no_split_data$user_id)),rep("split",max(split_data$user_id))),"response_time"=c(no_split_data$reaction_time,split_data$reaction_time))
+head(compare_response_time_data)
+tail(compare_response_time_data)
+```
+
+```{r}
+ggplot(data = compare_response_time_data, aes(x =dependent , y = response_time, colour =dependent , fill = dependent)) + geom_boxplot()+ylab("Response Time (s)")
+```
+
+# 分析
+
+## t検定（母平均の差の検定）
+
+分割あり/なしの分散が等しいとき
+```{r}
+t.test(subset(compare_response_time_data,dependent="no split")$response_time,subset(compare_response_time_data,dependent="split")$response_time,paired = T,alternative = "two.sided",var.equal = T,conf.level = 0.95)
+```
+
+分割あり/なしの分散が異なるとき
+```{r}
+t.test(subset(compare_response_time_data,dependent="no split")$response_time,subset(compare_response_time_data,dependent="split")$response_time,paired = T,alternative = "two.sided",var.equal = F,conf.level = 0.95)
+```
+## ウィルコクスンの符号付き順位検定
+
+```{r}
+wilcox.test(subset(compare_response_time_data,dependent="no split")$response_time,subset(compare_response_time_data,dependent="split")$response_time,paired = T,alternative = "two.sided")
+```
