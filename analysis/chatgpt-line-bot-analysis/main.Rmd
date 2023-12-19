@@ -124,6 +124,7 @@ sd(split_data$reaction_time)
 
 ```{r}
 library(ggplot2)
+library(ggbeeswarm)
 ```
 
 ```{r}
@@ -133,7 +134,7 @@ tail(compare_response_time_data)
 ```
 
 ```{r}
-ggplot(data = compare_response_time_data, aes(x =dependent , y = response_time, colour =dependent , fill = dependent)) + geom_boxplot()+ylab("Response Time (s)")
+ggplot(data = compare_response_time_data, aes(x =dependent , y = response_time, fill = dependent)) +stat_boxplot(geom = "errorbar", width = 0.2)+ geom_boxplot(outlier.color = "black")+ylab("Response Time (s)")+ stat_summary(geom = "point", shape = 2,fun = "mean", color = "black")+geom_beeswarm(aes(color = dependent),cex = 1.2,show.legend = FALSE)
 ```
 
 # 分析
