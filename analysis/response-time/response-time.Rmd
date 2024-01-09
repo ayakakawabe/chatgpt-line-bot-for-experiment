@@ -58,7 +58,7 @@ for (person in range(1,max(timestamp_no_split$user_id))) {
 ### 分割なし
 
 ```{r}
-hist(timestamp_no_split$reaction_time,breaks=seq(0,max(timestamp_no_split$reaction_time,timestamp_split$reaction_time)+10,5),xlab="Response Time (s)",main="Histogram of response time without split")
+hist(timestamp_no_split$reaction_time,breaks=seq(0,max(timestamp_no_split$reaction_time,timestamp_split$reaction_time)+10,5),xlab="Response Time (s)",main="Histogram of response time without split",col="CornFlowerBlue")
 ```
 
 データ成形（平均値）
@@ -91,7 +91,7 @@ sd(no_split_data$reaction_time)
 ### 分割あり
 
 ```{r}
-hist(timestamp_split$reaction_time,breaks=seq(0,max(timestamp_no_split$reaction_time,timestamp_split$reaction_time)+10,5),xlab="Response Time (s)",main="Histogram of response time with split")
+hist(timestamp_split$reaction_time,breaks=seq(0,max(timestamp_no_split$reaction_time,timestamp_split$reaction_time)+10,5),xlab="Response Time (s)",main="Histogram of response time with split",col="CornFlowerBlue")
 ```
 
 データ成形（平均値）
@@ -125,6 +125,7 @@ sd(split_data$reaction_time)
 ```{r}
 library(ggplot2)
 library(ggbeeswarm)
+library("ggsignif")
 ```
 
 ```{r}
@@ -134,7 +135,7 @@ tail(compare_response_time_data)
 ```
 
 ```{r}
-ggplot(data = compare_response_time_data, aes(x =dependent , y = response_time, fill = dependent)) +stat_boxplot(geom = "errorbar", width = 0.2)+ geom_boxplot(outlier.color = "black")+ylab("Response Time (s)")+ stat_summary(geom = "point", shape = 2,fun = "mean", color = "black")+geom_beeswarm(aes(color = dependent),cex = 1.2,show.legend = FALSE)
+ggplot(data = compare_response_time_data, aes(x =dependent , y = response_time, fill = dependent)) +stat_boxplot(geom = "errorbar", width = 0.2)+ geom_boxplot(outlier.color = "black")+ylab("Response Time (s)")+ stat_summary(geom = "point", shape = 2,fun = "mean", color = "black")+geom_beeswarm(aes(color = dependent),cex = 1.2,show.legend = FALSE)+geom_signif(comparisons = list(c("no split", "split")),test = "t.test",na.rm = FALSE,map_signif_level = TRUE,y_position =25, col = "red") + theme_minimal()
 ```
 
 # 分析
