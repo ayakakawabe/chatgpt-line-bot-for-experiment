@@ -10,6 +10,7 @@ output: html_document
 ```{r}
 personality<-read.csv("csv/personality.csv",header = T)
 functional<-read.csv("csv/functional.csv",header = T)
+charm<-read.csv("csv/charm.csv",header=T)
 ```
 
 # 人格的印象
@@ -146,4 +147,58 @@ ggplot(functional_plot_data,aes(x = dependent,y = score,fill=dependent))+geom_ba
   geom_segment(x = 1, xend = 1, y = 7.5, yend = 7.2) +
   geom_segment(x = 1, xend = 2, y = 7.5, yend = 7.5) +
   geom_segment(x = 2, xend = 2, y = 7.5, yend = 7.2) + theme_minimal()
+```
+
+
+# 愛嬌について
+
+```{r}
+head(charm)
+```
+
+##　基礎統計量
+```{r}
+charm_table_no_split<-table(charm$no_split)
+round(100*charm_table_no_split/sum(charm_table_no_split),2)
+```
+0 -> 分割なし
+1 -> 分割あり
+### 分割あり
+```{r}
+charm_table_split<-table(charm$split)
+round(100*charm_table_split/sum(charm_table_split),2)
+```
+0 -> 分割なし
+1 -> 分割あり
+
+## 分析
+
+### 母比率の差の検定
+```{r}
+prop.test(c(charm_table_no_split[2],charm_table_split[2]),c(sum(charm_table_no_split),sum(charm_table_split)),alternative = "two.sided",conf.level = 0.95)
+```
+### フィッシャーの確率検定
+```{r}
+charm_matrix_data<-matrix(c(charm_table_no_split,charm_table_split),nrow=2,byrow=T)
+colnames(charm_matrix_data)<-c("そう思わない","そう思う")
+rownames(charm_matrix_data)<-c("no split","split")
+charm_matrix_data
+```
+```{r}
+fisher.test(charm_matrix_data,conf.level = 0.95)
+```
+
+## グラフ
+```{r}
+charm_plot_data<-data.frame("dependent"=c("no split","no split","split","split"),"answer"=c("そう思わない","そう思う","そう思わない","そう思う"),"frequency"=c(charm_table_no_split,charm_table_split))
+head(charm_plot_data)
+```
+
+```{r}
+ggplot(data=charm_plot_data,aes(x=dependent,y=frequency,fill=answer))+geom_bar(position ="dodge",stat = "identity")+
+  #検定結果によって変わる
+  geom_text(aes(x = 1.5, y =8.7, label = "***")) + 
+  geom_segment(x = 1, xend = 1, y = 8.5, yend = 8.2) +
+  geom_segment(x = 1, xend = 2, y = 8.5, yend = 8.5) +
+  geom_segment(x = 2, xend = 2, y = 8.5, yend = 8.2)+ theme_minimal()
 ```
