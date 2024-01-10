@@ -157,19 +157,26 @@ head(charm)
 ```
 
 ##　基礎統計量
+
+### 分割なし
+
 ```{r}
 charm_table_no_split<-table(charm$no_split)
 round(100*charm_table_no_split/sum(charm_table_no_split),2)
 ```
-0 -> 分割なし
-1 -> 分割あり
+
+0 -> そう思わない
+
+1 -> そう思う
+
 ### 分割あり
 ```{r}
 charm_table_split<-table(charm$split)
 round(100*charm_table_split/sum(charm_table_split),2)
 ```
-0 -> 分割なし
-1 -> 分割あり
+0 -> そう思わない
+
+1 -> そう思う
 
 ## 分析
 
