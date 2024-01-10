@@ -102,3 +102,48 @@ sd(functional$split)
 print("最小値　第一四分位　中央値　平均値　第三四分位　最大値",quote=F)
 summary((functional$split))
 ```
+
+## 分析
+
+### t検定（母平均の差の検定）
+
+分割あり/なしの分散が等しいとき
+```{r}
+t.test(functional$no_split,functional$split,paired = T,alternative = "two.sided",var.equal = T,conf.level = 0.95)
+```
+
+分割あり/なしの分散が異なるとき
+```{r}
+t.test(functional$no_split,functional$split,paired = T,alternative = "two.sided",var.equal = F,conf.level = 0.95)
+```
+### ウィルコクスンの符号付き順位検定
+```{r}
+library(coin)
+```
+```{r}
+functional_analysis_data<-data.frame("dependent"=factor(c(rep(0,max(functional$ID)),rep(1,max(functional$ID)))),"score"=c(functional$no_split,functional$split))
+head(functional_analysis_data)
+tail(functional_analysis_data)
+```
+0 = no split（分割なし）
+1 = split（分割あり）
+```{r}
+wilcox_test(score ~ dependent,data=functional_analysis_data,paired = T,alternative = "two.sided",distribution="exact")
+```
+
+## グラフ
+
+```{r}
+functional_plot_data<-data.frame("dependent"=c(rep("no split",max(functional$ID)),rep("split",max(functional$ID))),"score"=c(functional$no_split,functional$split))
+head(functional_plot_data)
+tail(functional_plot_data)
+```
+
+```{r}
+ggplot(functional_plot_data,aes(x = dependent,y = score,fill=dependent))+geom_bar(stat = "summary",fun = "mean",position = position_dodge(width = 0.9),width = 0.5)+stat_summary(geom = "point", shape = 4,fun = "median", color = "black",size=3,stroke=1.2)+stat_summary(geom = "errorbar",fun.data = "mean_sd",width = 0.1)+geom_beeswarm(cex = 1.2,show.legend = FALSE)+ 
+  #検定結果によって変わる
+  geom_text(aes(x = 1.5, y = 7.7, label = "***")) + 
+  geom_segment(x = 1, xend = 1, y = 7.5, yend = 7.2) +
+  geom_segment(x = 1, xend = 2, y = 7.5, yend = 7.5) +
+  geom_segment(x = 2, xend = 2, y = 7.5, yend = 7.2) + theme_minimal()
+```
