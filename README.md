@@ -316,7 +316,7 @@ python main_no_split.py
 ## 🥽分析方法🥽
 ### 実験後のcsvファイルの整形
 
-analysis/csv/format_timestamp_no_split.csv
+analysis/response-time/csv/format_timestamp_no_split.csv
 ```
 user_id	id	reaction_time
 1	2	16.64851999
@@ -329,7 +329,7 @@ user_id	id	reaction_time
 2	5	25.66398001
 ```
 
-analysis/csv/format_timestamp_split.csv
+analysis/response-time/csv/format_timestamp_split.csv
 ```
 user_id	id	reaction_time
 1	2	1.782169819
