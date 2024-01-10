@@ -94,7 +94,7 @@ id,bot,user
 * ptrhon-dotenv 1.0.0
 * line-bot-sdk 3.5.0
 
-## 💡使用方法💡
+## 💡使用方法
 
 ## 設定
 
@@ -221,7 +221,7 @@ $ ngrok http 5000
 
 5. Messaging API のQRコードからLINEで友達追加して操作する
 
-## 🧪実験時🧪
+## 🧪実験時
 （使用方法は一通り終わらせている前提で）
 1. VScodeを開く
 2. file > Open folder > chatgpt-line-bot-for-experiment（展開後のファイル）> chatgpt-line-bot-for-experiment > 開く
@@ -313,7 +313,7 @@ python main_no_split.py
 12. Messaging API のチャネルAをQRコードからLINEで友達追加して操作する
 
 
-## 🥽分析方法🥽
+## 💻分析方法
 ### 実験後のcsvファイルの整形
 
 analysis/response-time/csv/format_timestamp_no_split.csv
@@ -340,3 +340,41 @@ user_id	id	reaction_time
 2	2	3.110630035
 2	3	9.140679836
 ```
+### 質問紙調査
+#### 人格的印象（Q1-Q4）/機能的印象（Q5-Q10）
+1. 回答結果のExcelからデータを取り出す
+   ```
+   ID,Q1,Q2,Q3,Q4
+   ```
+2. データの置換
+   1. 全くそう思わない → 1
+   2. そう思わない → 2
+   3. どちらともいえない → 3
+   4. 非常にそう思う → 5
+   5. そう思う → 4
+3. IDごとに平均を算出
+4. データ整形
+   ```
+   ID,no split,split
+   ```
+
+#### 愛嬌を感じるか（Q11）
+1. 回答結果のExcelからデータを取り出す
+   ```
+   ID,Q11
+   ```
+2. データの置換
+   1. そう思わない → 0
+   2. そう思う → 1
+3. データ整形
+   ```
+   ID,no split,split
+   ```
+#### 自由記述
+1. 回答結果のExcelからデータを取り出す
+2. データ整形
+   ```
+   テキスト,分割
+   自由記述の内容,分割あり/分割なし
+   ```
+3. KHcoderで共起ネットワーク図を作成
