@@ -153,7 +153,7 @@ tail(response_time_analysis_data)
 ```{r}
 wilcox_test(response_time ~ dependent,data=response_time_analysis_data,paired = T,alternative = "two.sided",distribution="exact")
 ```
-### 分割あり/なしの箱ひげ図
+## 分割あり/なしの箱ひげ図
 
 ```{r}
 library(ggplot2)
@@ -169,3 +169,6 @@ ggplot(data = compare_response_time_data, aes(x =dependent , y = response_time, 
   geom_segment(x = 1, xend = 2, y = 21.5, yend = 21.5) +
   geom_segment(x = 2, xend = 2, y = 21.5, yend = 21.2) + theme_minimal()
 ```
+
+0 = no split（分割なし）
+1 = split（分割あり
