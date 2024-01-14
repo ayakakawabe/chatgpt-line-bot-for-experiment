@@ -1,0 +1,78 @@
+---
+title: "content"
+author: "Ayaka Kawabe"
+date: '2024-01-14'
+output: html_document
+---
+# データ読み込み
+
+```{r}
+content_no_split<-read.csv("csv/content_no_split.csv",header = T,fileEncoding = "cp932")
+content_split<-read.csv("csv/content_split.csv",header = T,fileEncoding = "cp932")
+```
+
+# データ整形
+idをresponse-timeに揃える
+```{r}
+if(content_no_split$id[1]==0){
+  content_no_split$id<-content_no_split$id-1
+}
+head(content_no_split)
+if(content_no_split$id[1]==0){
+  content_split$id<-content_split$id-1
+}
+head(content_split)
+```
+## 分割なし
+```{r}
+content_no_split_bot<-subset(content_no_split,speak=="bot")
+content_no_split_user<-subset(content_no_split,speak=="user")
+```
+
+```{r}
+content_no_split_bot<-transform(content_no_split_bot,content_length=nchar(content_no_split_bot$content))
+head(content_no_split_bot)
+content_no_split_user<-transform(content_no_split_user,content_length=nchar(content_no_split_user$content))
+head(content_no_split_user)
+```
+
+## 分割あり
+```{r}
+content_split_bot<-subset(content_split,speak=="bot")
+head(content_split_bot)
+content_split_user<-subset(content_split,speak=="user")
+head(content_split_user)
+```
+
+```{r}
+content_split_bot<-transform(content_split_bot,content_length=nchar(content_split_bot$content))
+head(content_split_bot)
+content_split_user<-transform(content_split_user,content_length=nchar(content_split_user$content))
+head(content_split_user)
+```
+
+# 分析
+
+## データ整形
+### botデータ
+```{r}
+analysis_bot_mean_content<-data.frame(matrix(rep(NA, 3), nrow=1))[numeric(0), ]
+colnames(analysis_bot_mean_content) <- c("user_id", "no_split","split")
+for(i in range(1,max(content_no_split$user_id))){
+  no_split_bot_mean_content_length<-mean(subset(content_no_split_bot,user_id==i)$content_length)
+  split_bot_mean_content_length<-mean(subset(content_split_bot,user_id==i)$content_length)
+  analysis_bot_mean_content[nrow(analysis_bot_mean_content) + 1, ] <-  c(i,no_split_bot_mean_content_length,split_bot_mean_content_length)
+}
+analysis_bot_mean_content
+```
+### userデータ
+```{r}
+analysis_user_mean_content<-data.frame(matrix(rep(NA, 3), nrow=1))[numeric(0), ]
+colnames(analysis_user_mean_content) <- c("user_id", "no_split","split")
+for(i in range(1,max(content_no_split$user_id))){
+  no_split_user_mean_content_length<-mean(subset(content_no_split_user,user_id==i)$content_length)
+  split_user_mean_content_length<-mean(subset(content_split_user,user_id==i)$content_length)
+  analysis_user_mean_content[nrow(analysis_user_mean_content) + 1, ] <-  c(i,no_split_user_mean_content_length,split_user_mean_content_length)
+}
+analysis_user_mean_content
+```
