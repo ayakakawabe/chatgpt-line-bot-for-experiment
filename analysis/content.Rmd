@@ -51,10 +51,8 @@ content_split_user<-transform(content_split_user,content_length=nchar(content_sp
 head(content_split_user)
 ```
 
-# 分析
+## botデータ
 
-## データ整形
-### botデータ
 ```{r}
 analysis_bot_mean_content<-data.frame(matrix(rep(NA, 3), nrow=1))[numeric(0), ]
 colnames(analysis_bot_mean_content) <- c("user_id", "no_split","split")
@@ -65,7 +63,9 @@ for(i in range(1,max(content_no_split$user_id))){
 }
 analysis_bot_mean_content
 ```
-### userデータ
+
+## userデータ
+
 ```{r}
 analysis_user_mean_content<-data.frame(matrix(rep(NA, 3), nrow=1))[numeric(0), ]
 colnames(analysis_user_mean_content) <- c("user_id", "no_split","split")
@@ -76,3 +76,117 @@ for(i in range(1,max(content_no_split$user_id))){
 }
 analysis_user_mean_content
 ```
+
+# 基本統計量
+
+## bot
+
+### 分割なし
+```{r}
+print("最小値　第一四分位　中央値　平均値　第三四分位　最大値",quote=F)
+summary(analysis_bot_mean_content$no_split)
+print("標準偏差",quote=F)
+sd(analysis_bot_mean_content$no_split)
+```
+
+```{r}
+hist(analysis_bot_mean_content$no_split,breaks=seq(0,30),xlab="length",main=NULL,col="CornFlowerBlue")
+```
+### 分割あり
+```{r}
+print("最小値　第一四分位　中央値　平均値　第三四分位　最大値",quote=F)
+summary(analysis_bot_mean_content$split)
+print("標準偏差",quote=F)
+sd(analysis_bot_mean_content$split)
+```
+
+```{r}
+hist(analysis_bot_mean_content$split,breaks=seq(0,30),xlab="length",main=NULL,col="CornFlowerBlue")
+```
+
+
+## user
+
+### 分割なし
+
+```{r}
+print("最小値　第一四分位　中央値　平均値　第三四分位　最大値",quote=F)
+summary(analysis_user_mean_content$no_split)
+print("標準偏差",quote=F)
+sd(analysis_user_mean_content$no_split)
+```
+
+```{r}
+hist(analysis_user_mean_content$no_split,breaks=seq(0,30),xlab="length",main=NULL,col="CornFlowerBlue")
+```
+
+### 分割あり
+
+```{r}
+print("最小値　第一四分位　中央値　平均値　第三四分位　最大値",quote=F)
+summary(analysis_user_mean_content$split)
+print("標準偏差",quote=F)
+sd(analysis_user_mean_content$split)
+```
+
+```{r}
+hist(analysis_user_mean_content$split,breaks=seq(0,30),xlab="length",main=NULL,col="CornFlowerBlue")
+```
+
+# 検定
+
+## t検定（母平均の差の検定）
+
+分割あり/なしの分散が等しいとき
+
+```{r}
+t.test(analysis_user_mean_content$no_split,analysis_user_mean_content$split,paired = T,alternative = "two.sided",var.equal = T,conf.level = 0.95)
+```
+
+分割あり/なしの分散が異なるとき
+```{r}
+t.test(analysis_user_mean_content$no_split,analysis_user_mean_content$split,paired = T,alternative = "two.sided",var.equal = F,conf.level = 0.95)
+```
+## ウィルコクスンの符号付き順位検定
+```{r}
+library(coin)
+```
+
+```{r}
+format_analysis_user_mean_content<-data.frame("dependent"=factor(c(rep(0,max(analysis_user_mean_content$user_id)),rep(1,max(analysis_user_mean_content$user_id)))),"length"=as.integer(c(analysis_user_mean_content$no_split,analysis_user_mean_content$split)))
+head(format_analysis_user_mean_content)
+tail(format_analysis_user_mean_content)
+format_analysis_user_mean_content
+```
+
+0 = no split（分割なし）
+1 = split（分割あり）
+
+```{r}
+if(mean(analysis_user_mean_content$no_split)==mean(analysis_user_mean_content$split) && sd(analysis_user_mean_content$no_split)==sd(analysis_user_mean_content$split)){
+  print("データの値が全てタイです",quote=F)
+  wilcox_test(length ~ dependent,data=format_analysis_user_mean_content,paired = T,alternative = "two.sided")
+}else{
+  wilcox_test(length ~ dependent,data=format_analysis_user_mean_content,paired = T,alternative = "two.sided",distribution="exact")
+}
+```
+
+## userデータ：分割あり/なしの箱ひげ図
+
+```{r}
+library(ggplot2)
+library(ggbeeswarm)
+library("ggsignif")
+```
+
+```{r}
+ggplot(data = format_analysis_user_mean_content, aes(x =dependent , y = length, fill = dependent)) +stat_boxplot(geom = "errorbar", width = 0.2)+ geom_boxplot(outlier.color = "black")+ylab("length")+ stat_summary(geom = "point", shape = 4,fun = "mean", color = "black",size=3,stroke=1.2)+geom_beeswarm(cex = 1.2,show.legend = FALSE)+
+  #検定結果によって変わる
+  geom_text(aes(x = 1.5, y =21.7, label = "***")) + 
+  geom_segment(x = 1, xend = 1, y = 21.5, yend = 21.2) +
+  geom_segment(x = 1, xend = 2, y = 21.5, yend = 21.5) +
+  geom_segment(x = 2, xend = 2, y = 21.5, yend = 21.2) + theme_minimal()
+```
+
+0 = no split（分割なし）
+1 = split（分割あり
