@@ -11,6 +11,12 @@ output: html_document
 timestamp_no_split<-read.csv("csv/format_timestamp_no_split.csv",header = T)
 timestamp_split<-read.csv("csv/format_timestamp_split.csv",header = T)
 ```
+# データ整形
+
+```{r}
+timestamp_no_split$reaction_time<-abs(timestamp_no_split$reaction_time)
+timestamp_split$reaction_time<-abs(timestamp_split$reaction_time)
+```
 
 ## 分割なし
 ```{r}
@@ -25,7 +31,8 @@ head(timestamp_split)
 
 ## 個人ごとの分析
 ```{r}
-for (person in range(1,max(timestamp_no_split$user_id))) {
+person_id<-c(seq(max(timestamp_no_split$user_id)))
+for (person in person_id) {
   print("person_id")
   print(person)
   
@@ -42,7 +49,7 @@ for (person in range(1,max(timestamp_no_split$user_id))) {
   print("person_id")
   print(person)
   print("分割あり",quote=F)
-  person_data_split<-subset(timestamp_split,user=person)
+  person_data_split<-subset(timestamp_split,user_id==person)
   print("返信数",quote=F)
   print(max(person_data_split$id))
   print("最小値　第一四分位　中央値　平均値　第三四分位　最大値（単位:s）",quote=F)
@@ -58,13 +65,14 @@ for (person in range(1,max(timestamp_no_split$user_id))) {
 ### 分割なし
 
 ```{r}
-hist(timestamp_no_split$reaction_time,breaks=seq(0,max(timestamp_no_split$reaction_time,timestamp_split$reaction_time)+10,5),xlab="Response Time (s)",main=NULL,col="CornFlowerBlue")
+hist(timestamp_no_split$reaction_time,xlab="Response Time (s)",col="CornFlowerBlue",main=NULL,breaks=seq(0,140,10))
 ```
 
 データ成形（平均値）
 ```{r}
 mean_c<-c()
-for(person in range(1,timestamp_no_split$user_id)){
+person_id<-c(seq(max(timestamp_no_split$user_id)))
+for(person in person_id){
   mean_c<-c(mean_c,mean(subset(timestamp_no_split,user_id==person)$reaction_time))
 }
 no_split_data<-data.frame("user_id"=seq(max(timestamp_no_split$user_id)),"reaction_time"=mean_c)
@@ -91,13 +99,14 @@ sd(no_split_data$reaction_time)
 ### 分割あり
 
 ```{r}
-hist(timestamp_split$reaction_time,breaks=seq(0,max(timestamp_no_split$reaction_time,timestamp_split$reaction_time)+10,5),xlab="Response Time (s)",main=NULL,col="CornFlowerBlue")
+hist(timestamp_split$reaction_time,xlab="Response Time (s)",col="CornFlowerBlue",main = NULL,breaks=seq(0,140,10))
 ```
 
 データ成形（平均値）
 ```{r}
 mean_c<-c()
-for(person in range(1,timestamp_split$user_id)){
+person_id<-c(seq(max(timestamp_no_split$user_id)))
+for(person in person_id){
   mean_c<-c(mean_c,mean(subset(timestamp_split,user_id==person)$reaction_time))
 }
 split_data<-data.frame("user_id"=seq(max(timestamp_split$user_id)),"reaction_time"=mean_c)
@@ -128,21 +137,6 @@ compare_response_time_data<-data.frame("dependent"=c(rep("no split",max(no_split
 head(compare_response_time_data)
 tail(compare_response_time_data)
 ```
-
-分割あり/なしの分散が等しいとき
-```{r}
-t.test(subset(compare_response_time_data,dependent="no split")$response_time,subset(compare_response_time_data,dependent="split")$response_time,paired = T,alternative = "two.sided",var.equal = T,conf.level = 0.95)
-```
-
-分割あり/なしの分散が異なるとき
-```{r}
-t.test(subset(compare_response_time_data,dependent="no split")$response_time,subset(compare_response_time_data,dependent="split")$response_time,paired = T,alternative = "two.sided",var.equal = F,conf.level = 0.95)
-```
-## ウィルコクスンの符号付き順位検定
-```{r}
-library(coin)
-```
-
 ```{r}
 response_time_analysis_data<-data.frame("dependent"=factor(c(rep(0,max(no_split_data$user_id)),rep(1,max(split_data$user_id)))),"response_time"=c(no_split_data$reaction_time,split_data$reaction_time))
 head(response_time_analysis_data)
@@ -150,9 +144,44 @@ tail(response_time_analysis_data)
 ```
 0 = no split（分割なし）
 1 = split（分割あり）
+
+
+分割あり/なしの分散が等しいとき
 ```{r}
-wilcox_test(response_time ~ dependent,data=response_time_analysis_data,paired = T,alternative = "two.sided",distribution="exact")
+t.test(response_time ~ dependent,data=response_time_analysis_data,paired = T,alternative = "two.sided",var.equal = T,conf.level = 0.95)
 ```
+
+分割あり/なしの分散が異なるとき
+```{r}
+t.test(response_time ~ dependent,data=response_time_analysis_data,paired = T,alternative = "two.sided",var.equal = F,conf.level = 0.95)
+```
+## ウィルコクスンの符号付き順位検定
+```{r}
+library(coin)
+```
+
+
+```{r}
+response_time_result<-wilcox_test(response_time ~ dependent,data=response_time_analysis_data,paired = T,alternative = "two.sided",distribution="exact")
+response_time_result
+```
+
+### 効果量
+
+```{r}
+p <- pvalue(response_time_result)
+z <- qnorm(1 - p/2)#両側検定の場合
+n<-length(response_time_analysis_data$dependent)/2
+r <- z / sqrt(n)
+print(r)
+```
+### 検定力
+
+```{r}
+power.t.test(n=n,delta=r,sig.level=0.05,type="paired",strict=T)$power
+```
+
+
 ## 分割あり/なしの箱ひげ図
 
 ```{r}
@@ -162,13 +191,15 @@ library("ggsignif")
 ```
 
 ```{r}
-ggplot(data = compare_response_time_data, aes(x =dependent , y = response_time, fill = dependent)) +stat_boxplot(geom = "errorbar", width = 0.2)+ geom_boxplot(outlier.color = "black")+ylab("Response Time (s)")+ stat_summary(geom = "point", shape = 4,fun = "mean", color = "black",size=3,stroke=1.2)+geom_beeswarm(cex = 1.2,show.legend = FALSE)+
+ggplot(data = compare_response_time_data, aes(x =dependent , y = response_time, fill = dependent)) +stat_boxplot(geom = "errorbar", width = 0.2)+ geom_boxplot(outlier.color = "black")+ylab("Response Time (s)")+ stat_summary(geom = "point", shape = 4,fun = "mean", color = "red",size=3,stroke=1.2)+
   #検定結果によって変わる
-  geom_text(aes(x = 1.5, y =21.7, label = "***")) + 
-  geom_segment(x = 1, xend = 1, y = 21.5, yend = 21.2) +
-  geom_segment(x = 1, xend = 2, y = 21.5, yend = 21.5) +
-  geom_segment(x = 2, xend = 2, y = 21.5, yend = 21.2) + theme_minimal()
+  geom_text(aes(x = 1.5, y =47.9, label = "n.s.")) + 
+  geom_segment(x = 1, xend = 1, y = 46.8, yend = 45.8) +
+  geom_segment(x = 1, xend = 2, y = 46.8, yend = 46.8) +
+  geom_segment(x = 2, xend = 2, y = 46.8, yend = 45.8) + theme_minimal()
 ```
 
 0 = no split（分割なし）
 1 = split（分割あり
+
+✕：平均値

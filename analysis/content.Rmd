@@ -56,7 +56,8 @@ head(content_split_user)
 ```{r}
 analysis_bot_mean_content<-data.frame(matrix(rep(NA, 3), nrow=1))[numeric(0), ]
 colnames(analysis_bot_mean_content) <- c("user_id", "no_split","split")
-for(i in range(1,max(content_no_split$user_id))){
+person_id<-c(seq(max(content_no_split$user_id)))
+for(i in person_id){
   no_split_bot_mean_content_length<-mean(subset(content_no_split_bot,user_id==i)$content_length)
   split_bot_mean_content_length<-mean(subset(content_split_bot,user_id==i)$content_length)
   analysis_bot_mean_content[nrow(analysis_bot_mean_content) + 1, ] <-  c(i,no_split_bot_mean_content_length,split_bot_mean_content_length)
@@ -69,7 +70,8 @@ analysis_bot_mean_content
 ```{r}
 analysis_user_mean_content<-data.frame(matrix(rep(NA, 3), nrow=1))[numeric(0), ]
 colnames(analysis_user_mean_content) <- c("user_id", "no_split","split")
-for(i in range(1,max(content_no_split$user_id))){
+person_id<-c(seq(max(content_no_split$user_id)))
+for(i in person_id){
   no_split_user_mean_content_length<-mean(subset(content_no_split_user,user_id==i)$content_length)
   split_user_mean_content_length<-mean(subset(content_split_user,user_id==i)$content_length)
   analysis_user_mean_content[nrow(analysis_user_mean_content) + 1, ] <-  c(i,no_split_user_mean_content_length,split_user_mean_content_length)
@@ -90,7 +92,7 @@ sd(analysis_bot_mean_content$no_split)
 ```
 
 ```{r}
-hist(analysis_bot_mean_content$no_split,breaks=seq(0,30),xlab="length",main=NULL,col="CornFlowerBlue")
+hist(analysis_bot_mean_content$no_split,xlab="length",main=NULL,col="CornFlowerBlue",breaks=seq(0,180,10))
 ```
 ### 分割あり
 ```{r}
@@ -101,7 +103,7 @@ sd(analysis_bot_mean_content$split)
 ```
 
 ```{r}
-hist(analysis_bot_mean_content$split,breaks=seq(0,30),xlab="length",main=NULL,col="CornFlowerBlue")
+hist(analysis_bot_mean_content$split,xlab="length",main=NULL,col="CornFlowerBlue",breaks=seq(0,180,10))
 ```
 
 
@@ -117,7 +119,7 @@ sd(analysis_user_mean_content$no_split)
 ```
 
 ```{r}
-hist(analysis_user_mean_content$no_split,breaks=seq(0,30),xlab="length",main=NULL,col="CornFlowerBlue")
+hist(analysis_user_mean_content$no_split,xlab="length",main=NULL,col="CornFlowerBlue",breaks=seq(0,35,5))
 ```
 
 ### 分割あり
@@ -130,7 +132,7 @@ sd(analysis_user_mean_content$split)
 ```
 
 ```{r}
-hist(analysis_user_mean_content$split,breaks=seq(0,30),xlab="length",main=NULL,col="CornFlowerBlue")
+hist(analysis_user_mean_content$split,xlab="length",main=NULL,col="CornFlowerBlue",breaks=seq(0,35,5))
 ```
 
 # 検定
@@ -180,13 +182,15 @@ library("ggsignif")
 ```
 
 ```{r}
-ggplot(data = format_analysis_user_mean_content, aes(x =dependent , y = length, fill = dependent)) +stat_boxplot(geom = "errorbar", width = 0.2)+ geom_boxplot(outlier.color = "black")+ylab("length")+ stat_summary(geom = "point", shape = 4,fun = "mean", color = "black",size=3,stroke=1.2)+geom_beeswarm(cex = 1.2,show.legend = FALSE)+
+ggplot(data = format_analysis_user_mean_content, aes(x =dependent , y = length, fill = dependent)) +stat_boxplot(geom = "errorbar", width = 0.2)+ geom_boxplot(outlier.color = "black")+ylab("length")+ stat_summary(geom = "point", shape = 4,fun = "mean", color = "red",size=3,stroke=1.2)+
   #検定結果によって変わる
-  geom_text(aes(x = 1.5, y =21.7, label = "***")) + 
-  geom_segment(x = 1, xend = 1, y = 21.5, yend = 21.2) +
-  geom_segment(x = 1, xend = 2, y = 21.5, yend = 21.5) +
-  geom_segment(x = 2, xend = 2, y = 21.5, yend = 21.2) + theme_minimal()
+  geom_text(aes(x = 1.5, y =33.2, label = "n.s.")) + 
+  geom_segment(x = 1, xend = 1, y = 32.5, yend = 32.2) +
+  geom_segment(x = 1, xend = 2, y = 32.5, yend = 32.5) +
+  geom_segment(x = 2, xend = 2, y = 32.5, yend = 32.2) + theme_minimal()
 ```
 
 0 = no split（分割なし）
-1 = split（分割あり
+1 = split（分割あり)
+
+✕：平均値
