@@ -93,6 +93,10 @@ sd(analysis_bot_mean_content$no_split)
 
 ```{r}
 hist(analysis_bot_mean_content$no_split,xlab="length",main=NULL,col="CornFlowerBlue",breaks=seq(0,180,10))
+
+png("bot_content_no_split_hist.png", width = 2000, height =1500, res = 400)
+hist(analysis_bot_mean_content$no_split,xlab="length",main=NULL,col="CornFlowerBlue",breaks=seq(0,180,10))
+dev.off()
 ```
 ### 分割あり
 ```{r}
@@ -104,6 +108,10 @@ sd(analysis_bot_mean_content$split)
 
 ```{r}
 hist(analysis_bot_mean_content$split,xlab="length",main=NULL,col="CornFlowerBlue",breaks=seq(0,180,10))
+
+png("bot_content_split_hist.png", width = 2000, height =1500, res = 400)
+hist(analysis_bot_mean_content$split,xlab="length",main=NULL,col="CornFlowerBlue",breaks=seq(0,180,10))
+dev.off()
 ```
 
 
@@ -120,6 +128,10 @@ sd(analysis_user_mean_content$no_split)
 
 ```{r}
 hist(analysis_user_mean_content$no_split,xlab="length",main=NULL,col="CornFlowerBlue",breaks=seq(0,35,5))
+
+png("user_content_no_split_hist.png", width = 2000, height =1500, res = 400)
+hist(analysis_user_mean_content$no_split,xlab="length",main=NULL,col="CornFlowerBlue",breaks=seq(0,35,5))
+dev.off()
 ```
 
 ### 分割あり
@@ -133,6 +145,10 @@ sd(analysis_user_mean_content$split)
 
 ```{r}
 hist(analysis_user_mean_content$split,xlab="length",main=NULL,col="CornFlowerBlue",breaks=seq(0,35,5))
+
+png("user_content_split_hist.png", width = 2000, height =1500, res = 400)
+hist(analysis_user_mean_content$split,xlab="length",main=NULL,col="CornFlowerBlue",breaks=seq(0,35,5))
+dev.off()
 ```
 
 # 検定
@@ -184,10 +200,19 @@ library("ggsignif")
 ```{r}
 ggplot(data = format_analysis_user_mean_content, aes(x =dependent , y = length, fill = dependent)) +stat_boxplot(geom = "errorbar", width = 0.2)+ geom_boxplot(outlier.color = "black")+ylab("length")+ stat_summary(geom = "point", shape = 4,fun = "mean", color = "red",size=3,stroke=1.2)+
   #検定結果によって変わる
-  geom_text(aes(x = 1.5, y =33.2, label = "n.s.")) + 
-  geom_segment(x = 1, xend = 1, y = 32.5, yend = 32.2) +
+  geom_text(aes(x = 1.5, y =33.3, label = "n.s.")) + 
+  geom_segment(x = 1, xend = 1, y = 32.5, yend = 32) +
   geom_segment(x = 1, xend = 2, y = 32.5, yend = 32.5) +
-  geom_segment(x = 2, xend = 2, y = 32.5, yend = 32.2) + theme_minimal()
+  geom_segment(x = 2, xend = 2, y = 32.5, yend = 32) + theme_minimal()
+
+png("user_content_boxplot.png", width = 2000, height =1500, res = 400)
+ggplot(data = format_analysis_user_mean_content, aes(x =dependent , y = length, fill = dependent)) +stat_boxplot(geom = "errorbar", width = 0.2)+ geom_boxplot(outlier.color = "black")+ylab("length")+ stat_summary(geom = "point", shape = 4,fun = "mean", color = "red",size=3,stroke=1.2)+
+  #検定結果によって変わる
+  geom_text(aes(x = 1.5, y =33.3, label = "n.s.")) + 
+  geom_segment(x = 1, xend = 1, y = 32.5, yend = 32) +
+  geom_segment(x = 1, xend = 2, y = 32.5, yend = 32.5) +
+  geom_segment(x = 2, xend = 2, y = 32.5, yend = 32) + theme_minimal()
+dev.off()
 ```
 
 0 = no split（分割なし）

@@ -107,6 +107,16 @@ ggplot(personality_plot_data,aes(x = dependent,y = score,fill=dependent))+geom_b
   geom_segment(x = 1, xend = 1, y = 5.5, yend = 5.2) +
   geom_segment(x = 1, xend = 2, y = 5.5, yend = 5.5) +
   geom_segment(x = 2, xend = 2, y = 5.5, yend = 5.2) + theme_minimal()
+
+png("personality_barplot.png", width = 2000, height =1500, res = 400)
+ggplot(personality_plot_data,aes(x = dependent,y = score,fill=dependent))+geom_bar(stat = "summary",fun = "mean",position = position_dodge(width = 0.9),width = 0.5)+stat_summary(geom = "errorbar",fun.data = "mean_sd",width = 0.1)+ 
+  #検定結果によって変わる
+  geom_text(aes(x = 1.5, y = 5.7, label = "**")) + 
+  geom_segment(x = 1, xend = 1, y = 5.5, yend = 5.2) +
+  geom_segment(x = 1, xend = 2, y = 5.5, yend = 5.5) +
+  geom_segment(x = 2, xend = 2, y = 5.5, yend = 5.2) + theme_minimal()
+dev.off()
+
 ```
 
 # 機能的印象
@@ -191,6 +201,15 @@ ggplot(functional_plot_data,aes(x = dependent,y = score,fill=dependent))+geom_ba
   geom_segment(x = 1, xend = 1, y = 5.5, yend = 5.2) +
   geom_segment(x = 1, xend = 2, y = 5.5, yend = 5.5) +
   geom_segment(x = 2, xend = 2, y = 5.5, yend = 5.2) + theme_minimal()
+
+png("functional_barplot.png", width = 2000, height =1500, res = 400)
+ggplot(functional_plot_data,aes(x = dependent,y = score,fill=dependent))+geom_bar(stat = "summary",fun = "mean",position = position_dodge(width = 0.9),width = 0.5)+stat_summary(geom = "errorbar",fun.data = "mean_sd",width = 0.1)+ 
+  #検定結果によって変わる
+  geom_text(aes(x = 1.5, y = 5.7, label = "n.s.")) + 
+  geom_segment(x = 1, xend = 1, y = 5.5, yend = 5.2) +
+  geom_segment(x = 1, xend = 2, y = 5.5, yend = 5.5) +
+  geom_segment(x = 2, xend = 2, y = 5.5, yend = 5.2) + theme_minimal()
+dev.off()
 ```
 
 
@@ -266,4 +285,13 @@ ggplot(data=charm_plot_data,aes(x=dependent,y=frequency,fill=answer))+geom_bar(p
   geom_segment(x = 1, xend = 1, y = 8.5, yend = 8.2) +
   geom_segment(x = 1, xend = 2, y = 8.5, yend = 8.5) +
   geom_segment(x = 2, xend = 2, y = 8.5, yend = 8.2)+ theme_minimal()
+
+png("charm_barplot.png", width = 2000, height =1500, res = 400)
+ggplot(data=charm_plot_data,aes(x=dependent,y=frequency,fill=answer))+geom_bar(position ="dodge",stat = "identity")+
+  #検定結果によって変わる
+  geom_text(aes(x = 1.5, y =8.7, label = "n.s.")) + 
+  geom_segment(x = 1, xend = 1, y = 8.5, yend = 8.2) +
+  geom_segment(x = 1, xend = 2, y = 8.5, yend = 8.5) +
+  geom_segment(x = 2, xend = 2, y = 8.5, yend = 8.2)+ theme_minimal()
+dev.off()
 ```

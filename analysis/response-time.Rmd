@@ -64,8 +64,16 @@ for (person in person_id) {
 
 ### 分割なし
 
+反応時間（分割なし）のヒストグラム（timestamp_no_split_hist.png）
+
+x軸：反応時間
+y軸：頻度
+
 ```{r}
 hist(timestamp_no_split$reaction_time,xlab="Response Time (s)",col="CornFlowerBlue",main=NULL,breaks=seq(0,140,10))
+png("timestamp_no_split_hist.png", width = 2000, height =1500, res = 400)
+hist(timestamp_no_split$reaction_time,xlab="Response Time (s)",col="CornFlowerBlue",main=NULL,breaks=seq(0,140,10))
+dev.off()
 ```
 
 データ成形（平均値）
@@ -98,8 +106,16 @@ sd(no_split_data$reaction_time)
 
 ### 分割あり
 
+反応時間（分割あり）のヒストグラム（timestamp_split_hist.png）
+
+x軸：反応時間
+y軸：頻度
+
 ```{r}
 hist(timestamp_split$reaction_time,xlab="Response Time (s)",col="CornFlowerBlue",main = NULL,breaks=seq(0,140,10))
+png("timestamp_split_hist.png", width = 2000, height =1500, res = 400)
+hist(timestamp_split$reaction_time,xlab="Response Time (s)",col="CornFlowerBlue",main = NULL,breaks=seq(0,140,10))
+dev.off()
 ```
 
 データ成形（平均値）
@@ -155,7 +171,10 @@ t.test(response_time ~ dependent,data=response_time_analysis_data,paired = T,alt
 ```{r}
 t.test(response_time ~ dependent,data=response_time_analysis_data,paired = T,alternative = "two.sided",var.equal = F,conf.level = 0.95)
 ```
-## ウィルコクスンの符号付き順位検定
+## ウィルコクスンの符号順位検定
+
+ヒストグラムから標本が正規分布でないので、ウィルコクソンの符号順位検定を使う
+
 ```{r}
 library(coin)
 ```
@@ -166,7 +185,21 @@ response_time_result<-wilcox_test(response_time ~ dependent,data=response_time_a
 response_time_result
 ```
 
-### 効果量
+
+### 効果量（Cohen’s d）
+
+ｐ値はサンプルサイズによって変わる
+
+→効果量は、2つのデータの平均値の差を標準化した指標
+
+効果量の目安
+
+小：0.10
+
+中：0.30
+
+大：0.50
+
 
 ```{r}
 p <- pvalue(response_time_result)
@@ -190,6 +223,12 @@ library(ggbeeswarm)
 library("ggsignif")
 ```
 
+分割なし/分割ありの反応時間の箱ひげ図（timestamp_boxplot.png）
+
+✕：平均値
+
+・：外れ値
+
 ```{r}
 ggplot(data = compare_response_time_data, aes(x =dependent , y = response_time, fill = dependent)) +stat_boxplot(geom = "errorbar", width = 0.2)+ geom_boxplot(outlier.color = "black")+ylab("Response Time (s)")+ stat_summary(geom = "point", shape = 4,fun = "mean", color = "red",size=3,stroke=1.2)+
   #検定結果によって変わる
@@ -197,9 +236,13 @@ ggplot(data = compare_response_time_data, aes(x =dependent , y = response_time, 
   geom_segment(x = 1, xend = 1, y = 46.8, yend = 45.8) +
   geom_segment(x = 1, xend = 2, y = 46.8, yend = 46.8) +
   geom_segment(x = 2, xend = 2, y = 46.8, yend = 45.8) + theme_minimal()
+
+png("timestamp_boxplot.png", width = 2000, height =1500, res = 400)
+ggplot(data = compare_response_time_data, aes(x =dependent , y = response_time, fill = dependent)) +stat_boxplot(geom = "errorbar", width = 0.2)+ geom_boxplot(outlier.color = "black")+ylab("Response Time (s)")+ stat_summary(geom = "point", shape = 4,fun = "mean", color = "red",size=3,stroke=1.2)+
+  #検定結果によって変わる
+  geom_text(aes(x = 1.5, y =47.9, label = "n.s.")) + 
+  geom_segment(x = 1, xend = 1, y = 46.8, yend = 45.8) +
+  geom_segment(x = 1, xend = 2, y = 46.8, yend = 46.8) +
+  geom_segment(x = 2, xend = 2, y = 46.8, yend = 45.8) + theme_minimal()
+dev.off()
 ```
-
-0 = no split（分割なし）
-1 = split（分割あり
-
-✕：平均値
