@@ -4,6 +4,9 @@ author: "Ayaka Kawabe"
 date: '2024-01-14'
 output: html_document
 ---
+
+ボットとユーザの返信文字数の分析
+
 # データ読み込み
 
 ```{r}
@@ -81,7 +84,7 @@ analysis_user_mean_content
 
 # 基本統計量
 
-## bot
+## botの返信文字数
 
 ### 分割なし
 ```{r}
@@ -115,7 +118,7 @@ dev.off()
 ```
 
 
-## user
+## userの返信文字数
 
 ### 分割なし
 
@@ -165,7 +168,10 @@ t.test(analysis_user_mean_content$no_split,analysis_user_mean_content$split,pair
 ```{r}
 t.test(analysis_user_mean_content$no_split,analysis_user_mean_content$split,paired = T,alternative = "two.sided",var.equal = F,conf.level = 0.95)
 ```
-## ウィルコクスンの符号付き順位検定
+## ウィルコクスンの符号順位検定
+
+データが非正規なので、ウィルコクソン符号順位検定を採用
+
 ```{r}
 library(coin)
 ```
@@ -181,15 +187,46 @@ format_analysis_user_mean_content
 1 = split（分割あり）
 
 ```{r}
-if(mean(analysis_user_mean_content$no_split)==mean(analysis_user_mean_content$split) && sd(analysis_user_mean_content$no_split)==sd(analysis_user_mean_content$split)){
-  print("データの値が全てタイです",quote=F)
-  wilcox_test(length ~ dependent,data=format_analysis_user_mean_content,paired = T,alternative = "two.sided")
-}else{
-  wilcox_test(length ~ dependent,data=format_analysis_user_mean_content,paired = T,alternative = "two.sided",distribution="exact")
-}
+content_result<-wilcox_test(length ~ dependent,data=format_analysis_user_mean_content,paired = T,alternative = "two.sided",distribution="exact")
+content_result
 ```
+### 効果量（Cohen’s d）
 
-## userデータ：分割あり/なしの箱ひげ図
+ｐ値はサンプルサイズによって変わる
+
+ → 効果量は、2つのデータの平均値の差を標準化した指標
+
+効果量の目安
+
+小：0.10
+
+中：0.30
+
+大：0.50
+
+
+```{r}
+p <- pvalue(content_result)
+z <- qnorm(1 - p/2)#両側検定の場合
+n<-length(format_analysis_user_mean_content$dependent)/2
+r <- z / sqrt(n)
+print(r)
+```
+### 検出力
+
+検出力＝検定結果の信頼性（1-第二種の誤り確率）
+
+ → 「〇％の確率で、有意差があるときにそれを正しく検出できる」
+
+```{r}
+content_power<-power.t.test(n=n,delta=r,sig.level=0.05,type="paired",strict=T)
+content_power
+print("検出力")
+content_power$power
+```
+## userデータ
+
+分割あり/なしのユーザの返信文字数の箱ひげ図
 
 ```{r}
 library(ggplot2)
@@ -198,7 +235,11 @@ library("ggsignif")
 ```
 
 ```{r}
-ggplot(data = format_analysis_user_mean_content, aes(x =dependent , y = length, fill = dependent)) +stat_boxplot(geom = "errorbar", width = 0.2)+ geom_boxplot(outlier.color = "black")+ylab("length")+ stat_summary(geom = "point", shape = 4,fun = "mean", color = "red",size=3,stroke=1.2)+
+format_plot_user_mean_content<-data.frame("dependent"=c(rep("no split",max(analysis_user_mean_content$user_id)),rep("split",max(analysis_user_mean_content$user_id))),"length"=as.integer(c(analysis_user_mean_content$no_split,analysis_user_mean_content$split)))
+```
+
+```{r}
+ggplot(data = format_plot_user_mean_content, aes(x =dependent , y = length, fill = dependent)) +stat_boxplot(geom = "errorbar", width = 0.2)+ geom_boxplot(outlier.color = "black")+ylab("length")+ stat_summary(geom = "point", shape = 4,fun = "mean", color = "red",size=3,stroke=1.2)+
   #検定結果によって変わる
   geom_text(aes(x = 1.5, y =33.3, label = "n.s.")) + 
   geom_segment(x = 1, xend = 1, y = 32.5, yend = 32) +
@@ -206,7 +247,7 @@ ggplot(data = format_analysis_user_mean_content, aes(x =dependent , y = length, 
   geom_segment(x = 2, xend = 2, y = 32.5, yend = 32) + theme_minimal()
 
 png("user_content_boxplot.png", width = 2000, height =1500, res = 400)
-ggplot(data = format_analysis_user_mean_content, aes(x =dependent , y = length, fill = dependent)) +stat_boxplot(geom = "errorbar", width = 0.2)+ geom_boxplot(outlier.color = "black")+ylab("length")+ stat_summary(geom = "point", shape = 4,fun = "mean", color = "red",size=3,stroke=1.2)+
+ggplot(data = format_plot_user_mean_content, aes(x =dependent , y = length, fill = dependent)) +stat_boxplot(geom = "errorbar", width = 0.2)+ geom_boxplot(outlier.color = "black")+ylab("length")+ stat_summary(geom = "point", shape = 4,fun = "mean", color = "red",size=3,stroke=1.2)+
   #検定結果によって変わる
   geom_text(aes(x = 1.5, y =33.3, label = "n.s.")) + 
   geom_segment(x = 1, xend = 1, y = 32.5, yend = 32) +

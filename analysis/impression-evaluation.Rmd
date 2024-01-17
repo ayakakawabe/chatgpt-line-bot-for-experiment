@@ -5,6 +5,8 @@ date: '2024-01-09'
 output: html_document
 ---
 
+ボットに対する印象評価（SD法）：人格的印象点/機械的印象点/愛嬌を感じるか の分析
+
 # データ読み込み
 
 ```{r}
@@ -27,6 +29,15 @@ print("最小値　第一四分位　中央値　平均値　第三四分位　�
 summary((personality$no_split))
 ```
 
+分割なしの人格的印象点のヒストグラム（personality_no_split_hist.png）
+
+```{r}
+hist(personality$no_split,xlab="score",col="CornFlowerBlue",main = NULL,breaks=seq(0,5,0.5))
+png("personality_no_split_hist.png", width = 2000, height =1500, res = 400)
+hist(personality$no_split,xlab="score",col="CornFlowerBlue",main = NULL,breaks=seq(0,5,0.5))
+dev.off()
+```
+
 ### 分割あり
 ```{r}
 print("標準偏差",quote=F)
@@ -35,7 +46,15 @@ print("最小値　第一四分位　中央値　平均値　第三四分位　�
 summary((personality$split))
 ```
 
-## グラフ
+分割ありの人格的印象点のヒストグラム（personality_split_hist.png）
+
+```{r}
+hist(personality$split,xlab="score",col="CornFlowerBlue",main = NULL,breaks=seq(0,5,0.5))
+png("personality_split_hist.png", width = 2000, height =1500, res = 400)
+hist(personality$split,xlab="score",col="CornFlowerBlue",main = NULL,breaks=seq(0,5,0.5))
+dev.off()
+```
+## 分析
 ```{r}
 library(ggplot2)
 library(ggbeeswarm)
@@ -50,9 +69,6 @@ head(personality_plot_data)
 tail(personality_plot_data)
 ```
 
-
-## 分析
-
 ### t検定（母平均の差の検定）
 
 分割あり/なしの分散が等しいとき
@@ -64,7 +80,10 @@ t.test(personality$no_split,personality$split,paired = T,alternative = "two.side
 ```{r}
 t.test(personality$no_split,personality$split,paired = T,alternative = "two.sided",var.equal = F,conf.level = 0.95)
 ```
-### ウィルコクスンの符号付き順位検定
+### ウィルコクソンの符号順位検定
+
+順序尺度＆データが非正規分布なので、ウィルコクソンの符号順位検定を採用
+
 ```{r}
 library(coin)
 ```
@@ -81,7 +100,19 @@ personality_result<-wilcox_test(score ~ dependent,data=personality_analysis_data
 personality_result
 ```
 
-### 効果量
+### 効果量（Cohen’s d）
+
+ｐ値はサンプルサイズによって変わる
+
+ → 効果量は、2つのデータの平均値の差を標準化した指標
+
+効果量の目安
+
+小：0.10
+
+中：0.30
+
+大：0.50
 
 ```{r}
 p <- pvalue(personality_result)
@@ -90,7 +121,11 @@ n<-length(personality_analysis_data$dependent)/2
 r <- z / sqrt(n)
 print(r)
 ```
-### 検定力
+### 検出力
+
+検出力＝検定結果の信頼性（1-第二種の誤り確率）
+
+ → 「〇％の確率で、有意差があるときにそれを正しく検出できる」
 
 ```{r}
 personality_power<-power.t.test(n=n,delta=r,sig.level=0.05,type="paired",strict=T)
@@ -100,6 +135,9 @@ personality_power$power
 ```
 
 ## グラフ
+
+分割あり/分割なしの人格的印象点の棒グラフ（personality_barplot.png）
+
 ```{r}
 ggplot(personality_plot_data,aes(x = dependent,y = score,fill=dependent))+geom_bar(stat = "summary",fun = "mean",position = position_dodge(width = 0.9),width = 0.5)+stat_summary(geom = "errorbar",fun.data = "mean_sd",width = 0.1)+ 
   #検定結果によって変わる
@@ -134,12 +172,30 @@ print("最小値　第一四分位　中央値　平均値　第三四分位　�
 summary((functional$no_split))
 ```
 
+分割なしの機能的印象点のヒストグラム（functional_no_split_hist.png）
+
+```{r}
+hist(functional$no_split,xlab="score",col="CornFlowerBlue",main = NULL,breaks=seq(0,5,0.5))
+png("functional_no_split_hist.png", width = 2000, height =1500, res = 400)
+hist(functional$no_split,xlab="score",col="CornFlowerBlue",main = NULL,breaks=seq(0,5,0.5))
+dev.off()
+```
+
 ### 分割あり
 ```{r}
 print("標準偏差",quote=F)
 sd(functional$split)
 print("最小値　第一四分位　中央値　平均値　第三四分位　最大値",quote=F)
 summary((functional$split))
+```
+
+分割ありの機能的印象点のヒストグラム（functional_split_hist.png）
+
+```{r}
+hist(functional$split,xlab="score",col="CornFlowerBlue",main = NULL,breaks=seq(0,5,0.5))
+png("functional_split_hist.png", width = 2000, height =1500, res = 400)
+hist(functional$split,xlab="score",col="CornFlowerBlue",main = NULL,breaks=seq(0,5,0.5))
+dev.off()
 ```
 
 ## 分析
@@ -155,7 +211,9 @@ t.test(functional$no_split,functional$split,paired = T,alternative = "two.sided"
 ```{r}
 t.test(functional$no_split,functional$split,paired = T,alternative = "two.sided",var.equal = F,conf.level = 0.95)
 ```
-### ウィルコクスンの符号付き順位検定
+### ウィルコクソンの符号付き順位検定
+
+順序尺度＆データが非正規分布なので、ウィルコクソンの符号順位検定を採用
 
 ```{r}
 functional_analysis_data<-data.frame("dependent"=factor(c(rep(0,max(functional$ID)),rep(1,max(functional$ID)))),"score"=c(functional$no_split,functional$split))
@@ -168,7 +226,19 @@ tail(functional_analysis_data)
 functional_result<-wilcox_test(score ~ dependent,data=functional_analysis_data,paired = T,alternative = "two.sided",distribution="exact")
 functional_result
 ```
-### 効果量
+### 効果量（Cohen’s d）
+
+ｐ値はサンプルサイズによって変わる
+
+ → 効果量は、2つのデータの平均値の差を標準化した指標
+
+効果量の目安
+
+小：0.10
+
+中：0.30
+
+大：0.50
 
 ```{r}
 p <- pvalue(functional_result)
@@ -177,7 +247,11 @@ n<-length(functional_analysis_data$dependent)/2
 r <- z / sqrt(n)
 print(r)
 ```
-### 検定力
+### 検出力
+
+検出力＝検定結果の信頼性（1-第二種の誤り確率）
+
+ → 「〇％の確率で、有意差があるときにそれを正しく検出できる」
 
 ```{r}
 functional_power<-power.t.test(n=n,delta=r,sig.level=0.05,type="paired",strict=T)
@@ -187,6 +261,8 @@ functional_power$power
 ```
 
 ## グラフ
+
+分割あり/分割なしの機能的印象点の棒グラフ（functional_barplot.png）
 
 ```{r}
 functional_plot_data<-data.frame("dependent"=c(rep("no split",max(functional$ID)),rep("split",max(functional$ID))),"score"=c(functional$no_split,functional$split))
@@ -256,7 +332,11 @@ charm_result<-prop.test(c(charm_table_no_split[2],charm_table_split[2]),c(sum(ch
 charm_result
 ```
 
-### 検定力
+### 検出力
+
+検出力＝検定結果の信頼性（1-第二種の誤り確率）
+
+ → 「〇％の確率で、有意差があるときにそれを正しく検出できる」
 
 ```{r}
 charm_power<-power.prop.test(p1=charm_table_no_split/sum(charm_table_no_split),p2=charm_table_split/sum(charm_table_split),n=n,sig.level=0.05,alternative="two.sided",strict=T)
@@ -268,11 +348,16 @@ personality_power$power
 
 ### フィッシャーの確率検定
 
+（母比率の差の検定で問題なかったので、今回は使用しない）
+
 ```{r}
 fisher.test(charm_matrix_data,conf.level = 0.95)
 ```
 
 ## グラフ
+
+分割あり/分割なしの愛嬌についての棒グラフ（charm_barplot.png）
+
 ```{r}
 charm_plot_data<-data.frame("dependent"=c("no split","no split","split","split"),"answer"=c("そう思わない","そう思う","そう思わない","そう思う"),"frequency"=c(charm_table_no_split,charm_table_split))
 head(charm_plot_data)

@@ -1,9 +1,11 @@
 ---
-title: "chatgpt-line-bot-analysis"
+title: "response-time"
 author: "Ayaka Kawabe"
 date: '2023-12-12'
 output: html_document
 ---
+
+ボットが送信してから、ユーザが返信するまでの時間を分析
 
 # データ読み込み
 
@@ -171,7 +173,7 @@ t.test(response_time ~ dependent,data=response_time_analysis_data,paired = T,alt
 ```{r}
 t.test(response_time ~ dependent,data=response_time_analysis_data,paired = T,alternative = "two.sided",var.equal = F,conf.level = 0.95)
 ```
-## ウィルコクスンの符号順位検定
+## ウィルコクソンの符号順位検定
 
 ヒストグラムから標本が正規分布でないので、ウィルコクソンの符号順位検定を使う
 
@@ -190,7 +192,7 @@ response_time_result
 
 ｐ値はサンプルサイズによって変わる
 
-→効果量は、2つのデータの平均値の差を標準化した指標
+ → 効果量は、2つのデータの平均値の差を標準化した指標
 
 効果量の目安
 
@@ -208,7 +210,11 @@ n<-length(response_time_analysis_data$dependent)/2
 r <- z / sqrt(n)
 print(r)
 ```
-### 検定力
+### 検出力
+
+検出力＝検定結果の信頼性（1-第二種の誤り確率）
+
+ → 「〇％の確率で、有意差があるときにそれを正しく検出できる」
 
 ```{r}
 power.t.test(n=n,delta=r,sig.level=0.05,type="paired",strict=T)$power
